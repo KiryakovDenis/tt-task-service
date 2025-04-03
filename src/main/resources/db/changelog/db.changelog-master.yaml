@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: db/changelog/202504011810__init_schema.sql
+  - include:
+      file: db/changelog/202504011811__create_table.sql
+  - include:
+      file: db/changelog/202504011909__create_trigger_on_task.sql
