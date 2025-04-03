@@ -107,8 +107,6 @@ public class TaskRepository {
         params.addValue("assignee_id", assigneeId);
         ofNullable(status).ifPresentOrElse(s -> params.addValue("status", s.name()),
                                            () -> params.addValue("status", null));
-        /*ofNullable(assigneeId).ifPresent(assignee -> params.addValue("assignee_id", assignee));
-        ofNullable(status).ifPresent(s -> params.addValue("staus", s.name()));*/
 
         return params;
     }
