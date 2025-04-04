@@ -119,8 +119,11 @@ public class TaskServiceTest {
     @Test
     @DisplayName("Валидация незаполненого поля title")
     public void validateNullTitle(){
+        String errorMessage = "Не заполнено поле Title.";
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(NullTitleInsertTask));
+        assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
+
 
     private TaskInsert EmptyTitleInsertTask = new TaskInsert(""
             , "testtesttest"
@@ -132,8 +135,11 @@ public class TaskServiceTest {
     @Test
     @DisplayName("Валидация пустого поля title")
     public void validateEmptyTitle(){
+        String errorMessage = "Не заполнено поле Title.";
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(EmptyTitleInsertTask));
+        assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
+
 
     private TaskInsert NullAssigneeInsertTask = new TaskInsert("test"
             , "testtesttest"
@@ -145,8 +151,11 @@ public class TaskServiceTest {
     @Test
     @DisplayName("Валидация незаполненного поля assignee")
     public void validateNullAssignee(){
+        String errorMessage = "Не заполнено поле Assignee.";
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(NullAssigneeInsertTask));
+        assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
+
 
     private TaskInsert NullAuthorInsertTask = new TaskInsert("test"
             , "testtesttest"
@@ -158,6 +167,41 @@ public class TaskServiceTest {
     @Test
     @DisplayName("Валидация незаполненного поля author")
     public void validateNullAuthor(){
+        String errorMessage = "Не заполнено поле Author.";
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(NullAuthorInsertTask));
+        assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
+
+    private TaskInsert NullDeadLineInsertTask = new TaskInsert("test"
+            , "testtesttest"
+            , null
+            , 1L
+            , 2L
+    );
+
+    @Test
+    @DisplayName("Валидация незаполненного поля deadLine")
+    public void validateNullDeadLine(){
+        String errorMessage = "Не заполнено поле DeadLine.";
+        BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(NullDeadLineInsertTask));
+        assertThat(bre.getMessage()).isEqualTo(errorMessage);
+    }
+
+
+    private TaskInsert ExpiredDeadLineInsertTask = new TaskInsert("test"
+            , "testtesttest"
+            , LocalDateTime.of(2024,5,5,0,0)
+            , 1L
+            , 2L
+    );
+
+    @Test
+    @DisplayName("Валидация просроченной даты выполнения")
+    public void validateExpiredDeadLine(){
+        String errorMessage = "поле DeadLine заполнено прошлой датой.";
+        BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(ExpiredDeadLineInsertTask));
+
+        assertThat(bre.getMessage()).isEqualTo(errorMessage);
+    }
+
 }

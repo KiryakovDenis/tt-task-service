@@ -46,7 +46,6 @@ public class TaskRepository {
                   ,dead_line = :dead_line
                   ,assignee = :assignee
              WHERE id = :id
-               AND status != 'DELETE'
             RETURNING *
             """;
 
