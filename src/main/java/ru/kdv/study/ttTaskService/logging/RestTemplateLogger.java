@@ -62,7 +62,6 @@ public class RestTemplateLogger implements ClientHttpRequestInterceptor {
 
     private String getResponseData(ClientHttpResponse response) throws IOException {
 
-
         return new StringJoiner("\n")
                 .add(String.format("HTTP status: %s", response.getStatusCode()))
                 .add(String.format("Headers: %s", (!response.getHeaders().isEmpty() ? response.getHeaders() : EMPTY_VALUE)))
