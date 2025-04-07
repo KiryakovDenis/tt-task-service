@@ -5,7 +5,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
-import ru.kdv.study.ttTaskService.logging.RestTemplateLogger;
 
 import java.time.Duration;
 
@@ -22,7 +21,6 @@ public class RestTemplateConfig {
         return restTemplateBuilder
                 .readTimeout(Duration.ofMillis(READ_TIMEOUT))
                 .connectTimeout(Duration.ofMillis(CONNECTION_TIMEOUT))
-                .interceptors(new RestTemplateLogger())
                 .build();
     }
 }

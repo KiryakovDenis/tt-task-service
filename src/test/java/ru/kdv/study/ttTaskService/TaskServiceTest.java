@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.kdv.study.ttTaskService.Exception.BadRequestException;
+import ru.kdv.study.ttTaskService.exception.BadRequestException;
 import ru.kdv.study.ttTaskService.model.Status;
 import ru.kdv.study.ttTaskService.model.Task;
 import ru.kdv.study.ttTaskService.model.dto.TaskInsert;

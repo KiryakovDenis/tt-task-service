@@ -5,7 +5,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.kdv.study.ttTaskService.Exception.DataBaseException;
+import ru.kdv.study.ttTaskService.exception.DataBaseException;
 import ru.kdv.study.ttTaskService.model.Status;
 import ru.kdv.study.ttTaskService.model.Task;
 import ru.kdv.study.ttTaskService.repository.mapper.TaskMapper;

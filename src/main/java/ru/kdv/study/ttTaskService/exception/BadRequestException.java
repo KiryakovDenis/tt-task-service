@@ -1,4 +1,4 @@
-package ru.kdv.study.ttTaskService.Exception;
+package ru.kdv.study.ttTaskService.exception;
 
 public class BadRequestException extends RuntimeException {
     public static BadRequestException create(String message) {

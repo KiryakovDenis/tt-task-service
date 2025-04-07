@@ -4,7 +4,7 @@ public enum Status {
     TO_DO ("Открыта"),
     IN_PROGRESS ("В работе"),
     DONE ("Выполнена"),
-    DELETE ("Закрыта");
+    DELETE ("Удалена");
 
     private String name;
 

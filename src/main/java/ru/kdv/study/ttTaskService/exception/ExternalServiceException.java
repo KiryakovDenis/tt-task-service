@@ -1,4 +1,4 @@
-package ru.kdv.study.ttTaskService.Exception;
+package ru.kdv.study.ttTaskService.exception;
 
 public class ExternalServiceException extends RuntimeException {
     public static ExternalServiceException create(String message) {

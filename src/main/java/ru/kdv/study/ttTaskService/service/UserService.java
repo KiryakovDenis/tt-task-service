@@ -3,12 +3,12 @@ package ru.kdv.study.ttTaskService.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import ru.kdv.study.ttTaskService.Exception.ExternalServiceException;
+import ru.kdv.study.ttTaskService.exception.ExternalServiceException;
 import ru.kdv.study.ttTaskService.config.UserServiceProperties;
 import ru.kdv.study.ttTaskService.model.User;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,30 +18,33 @@ public class UserService {
     private final RestTemplate restTemplate;
     private final UserServiceProperties userServiceProperties;
 
-    private static final String USER_EXIST_URL = "/user";
+    private static final String FIND_USER_URL = "/user";
 
     public Set<Long> getUsersByIds(final Set<Long> ids) {
-        User[] users;
         try {
-            String fullUrl = buildUserUrl(ids);
-            users = restTemplate.getForObject(fullUrl, User[].class);
+            String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+
+            String fullUrl = buildUserUrl();
+            return Arrays.stream(
+                        Objects.requireNonNull(
+                                restTemplate.getForObject(
+                                        fullUrl,
+                                        User[].class,
+                                        idsString
+                                )
+                        )
+                    )
+                    .map(User::getId)
+                    .collect(Collectors.toSet());
         } catch (Exception e) {
             throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));
         }
-
-        if (users != null) {
-            return Arrays.stream(users).map(User::getId).collect(Collectors.toSet());
-        } else {
-            return null;
-        }
     }
 
-    private String buildUserUrl(final Set<Long> ids) {
-        String listIds = ids.stream().map((s) -> {return "ids="+s;}).collect(Collectors.joining("&"));
+    private String buildUserUrl() {
         return userServiceProperties.getBaseUrl() +
-                USER_EXIST_URL +
-                "?" +
-                listIds;
+                FIND_USER_URL +
+                "?ids={ids}";
     }
-
 }

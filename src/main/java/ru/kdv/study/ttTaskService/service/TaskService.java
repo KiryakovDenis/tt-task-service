@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import ru.kdv.study.ttTaskService.Exception.BadRequestException;
+import ru.kdv.study.ttTaskService.exception.BadRequestException;
 import ru.kdv.study.ttTaskService.model.Status;
 import ru.kdv.study.ttTaskService.model.Task;
 import ru.kdv.study.ttTaskService.model.dto.TaskInsert;
@@ -33,6 +33,7 @@ public class TaskService {
         validate(tempTask);
         return taskRepository.insert(tempTask);
     }
+    
     @Transactional(readOnly = true)
     public Task getById(Long id) {
         return taskRepository.getById(id);
@@ -48,7 +49,7 @@ public class TaskService {
 
         Task tempTask = getById(taskUpdate.getId());
 
-        tempTask = taskUpdateToTask(taskUpdate, tempTask);
+        tempTask = taskUpdateDtoToTask(taskUpdate, tempTask);
 
         validate(tempTask);
 
@@ -66,7 +67,7 @@ public class TaskService {
                 .build();
     }
 
-    private Task taskUpdateToTask(final TaskUpdate taskUpdate, Task task) {
+    private Task taskUpdateDtoToTask(final TaskUpdate taskUpdate, Task task) {
         Task.TaskBuilder taskBuilder = Task.builder();
         taskBuilder.id(taskUpdate.getId());
         ofNullable(taskUpdate.getTitle()).ifPresentOrElse(taskBuilder::title, () -> taskBuilder.title(task.getTitle()));

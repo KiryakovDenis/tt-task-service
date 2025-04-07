@@ -1,4 +1,4 @@
-package ru.kdv.study.ttTaskService.Exception;
+package ru.kdv.study.ttTaskService.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ public class ExceptionController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ResponseEntity<ExceptionMessage> handleException(Exception e) {
-        log.error("ExceptionController#Exception", e);
+        log.error("ExceptionController#exception", e);
         return ResponseEntity.internalServerError()
                 .body(new ExceptionMessage(false, e.getMessage()));
     }
