@@ -35,7 +35,6 @@ public class TaskServiceTest {
     @Mock
     private UserService userService;
 
-
     @InjectMocks
     private TaskService taskService;
 
@@ -53,6 +52,60 @@ public class TaskServiceTest {
             .author(insertsuccessInsertTask.getAuthor())
             .assignee(insertsuccessInsertTask.getAssignee())
             .build();
+    private TaskUpdate updateSuccessUpdateTask = new TaskUpdate(
+            1L,
+            "test",
+            "testtesttest",
+            Status.TO_DO,
+            null,
+            1L,
+            LocalDateTime.of(2025,5,5,0,0)
+    );
+    private Task updateSuccessTask = Task.builder()
+            .id(updateSuccessUpdateTask.getId())
+            .title(updateSuccessUpdateTask.getTitle())
+            .description(updateSuccessUpdateTask.getDescription())
+            .status(updateSuccessUpdateTask.getStatus())
+            .deadLine(updateSuccessUpdateTask.getDeadLine())
+            .author(1L)
+            .assignee(updateSuccessUpdateTask.getAssignee())
+            .build();
+    private TaskInsert NullTitleInsertTask = new TaskInsert(null
+            , "testtesttest"
+            , LocalDateTime.of(2025,5,5,0,0)
+            , 1L
+            , 2L
+    );
+    private TaskInsert EmptyTitleInsertTask = new TaskInsert(""
+            , "testtesttest"
+            , LocalDateTime.of(2025,5,5,0,0)
+            , 1L
+            , 2L
+    );
+    private TaskInsert NullAssigneeInsertTask = new TaskInsert("test"
+            , "testtesttest"
+            , LocalDateTime.of(2025,5,5,0,0)
+            , 1L
+            , null
+    );
+    private TaskInsert NullAuthorInsertTask = new TaskInsert("test"
+            , "testtesttest"
+            , LocalDateTime.of(2025,5,5,0,0)
+            , null
+            , 2L
+    );
+    private TaskInsert NullDeadLineInsertTask = new TaskInsert("test"
+            , "testtesttest"
+            , null
+            , 1L
+            , 2L
+    );
+    private TaskInsert ExpiredDeadLineInsertTask = new TaskInsert("test"
+            , "testtesttest"
+            , LocalDateTime.of(2024,5,5,0,0)
+            , 1L
+            , 2L
+    );
 
     @Test
     @DisplayName("Успешное создание задачи")
@@ -68,28 +121,7 @@ public class TaskServiceTest {
 
         assertThat(result).isEqualTo(insertSuccessTask);
         verify(taskRepository).insert(insertSuccessTask);
-
     }
-
-    private TaskUpdate updateSuccessUpdateTask = new TaskUpdate(
-            1L,
-        "test",
-        "testtesttest",
-        Status.TO_DO,
-        null,
-        1L,
-        LocalDateTime.of(2025,5,5,0,0)
-    );
-
-    private Task updateSuccessTask = Task.builder()
-            .id(updateSuccessUpdateTask.getId())
-            .title(updateSuccessUpdateTask.getTitle())
-            .description(updateSuccessUpdateTask.getDescription())
-            .status(updateSuccessUpdateTask.getStatus())
-            .deadLine(updateSuccessUpdateTask.getDeadLine())
-            .author(1L)
-            .assignee(updateSuccessUpdateTask.getAssignee())
-            .build();
 
     @Test
     @DisplayName("Успешное обновление задачи")
@@ -106,15 +138,7 @@ public class TaskServiceTest {
 
         assertThat(result).isEqualTo(updateSuccessTask);
         verify(taskRepository).updateTask(updateSuccessTask);
-
     }
-
-    private TaskInsert NullTitleInsertTask = new TaskInsert(null
-            , "testtesttest"
-            , LocalDateTime.of(2025,5,5,0,0)
-            , 1L
-            , 2L
-    );
 
     @Test
     @DisplayName("Валидация незаполненого поля title")
@@ -124,14 +148,6 @@ public class TaskServiceTest {
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
 
-
-    private TaskInsert EmptyTitleInsertTask = new TaskInsert(""
-            , "testtesttest"
-            , LocalDateTime.of(2025,5,5,0,0)
-            , 1L
-            , 2L
-    );
-
     @Test
     @DisplayName("Валидация пустого поля title")
     public void validateEmptyTitle(){
@@ -139,14 +155,6 @@ public class TaskServiceTest {
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(EmptyTitleInsertTask));
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
-
-
-    private TaskInsert NullAssigneeInsertTask = new TaskInsert("test"
-            , "testtesttest"
-            , LocalDateTime.of(2025,5,5,0,0)
-            , 1L
-            , null
-    );
 
     @Test
     @DisplayName("Валидация незаполненного поля assignee")
@@ -156,14 +164,6 @@ public class TaskServiceTest {
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
 
-
-    private TaskInsert NullAuthorInsertTask = new TaskInsert("test"
-            , "testtesttest"
-            , LocalDateTime.of(2025,5,5,0,0)
-            , null
-            , 2L
-    );
-
     @Test
     @DisplayName("Валидация незаполненного поля author")
     public void validateNullAuthor(){
@@ -171,13 +171,6 @@ public class TaskServiceTest {
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(NullAuthorInsertTask));
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
-
-    private TaskInsert NullDeadLineInsertTask = new TaskInsert("test"
-            , "testtesttest"
-            , null
-            , 1L
-            , 2L
-    );
 
     @Test
     @DisplayName("Валидация незаполненного поля deadLine")
@@ -187,14 +180,6 @@ public class TaskServiceTest {
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
 
-
-    private TaskInsert ExpiredDeadLineInsertTask = new TaskInsert("test"
-            , "testtesttest"
-            , LocalDateTime.of(2024,5,5,0,0)
-            , 1L
-            , 2L
-    );
-
     @Test
     @DisplayName("Валидация просроченной даты выполнения")
     public void validateExpiredDeadLine(){
@@ -203,5 +188,4 @@ public class TaskServiceTest {
 
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
     }
-
 }
