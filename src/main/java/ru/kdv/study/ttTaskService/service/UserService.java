@@ -1,0 +1,50 @@
+package ru.kdv.study.ttTaskService.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import ru.kdv.study.ttTaskService.exception.ExternalServiceException;
+import ru.kdv.study.ttTaskService.config.UserServiceProperties;
+import ru.kdv.study.ttTaskService.model.User;
+
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final RestTemplate restTemplate;
+    private final UserServiceProperties userServiceProperties;
+
+    private static final String FIND_USER_URL = "/user";
+
+    public Set<Long> getUsersByIds(final Set<Long> ids) {
+        try {
+            String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+
+
+            String fullUrl = buildUserUrl();
+            return Arrays.stream(
+                        Objects.requireNonNull(
+                                restTemplate.getForObject(
+                                        fullUrl,
+                                        User[].class,
+                                        idsString
+                                )
+                        )
+                    )
+                    .map(User::getId)
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+            throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));
+        }
+    }
+
+    private String buildUserUrl() {
+        return userServiceProperties.getBaseUrl() +
+                FIND_USER_URL +
+                "?ids={ids}";
+    }
+}
