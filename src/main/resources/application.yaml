@@ -23,9 +23,9 @@ springdoc:
       description: Микросервис для работы с задачами системы Task Tracker
       version: 1.0.0
 user-service:
-  baseUrl: http://localhost:8080/api/v1
+  baseUrl: ${USER_SERVICE_URL:http://localhost:8080/api/v1}
 state-machine-service:
-  baseUrl: http://localhost:8082/api/v1
+  baseUrl: ${STATE_MACHINE_SERVICE_URL:http://localhost:8082/api/v1}
 app:
   rabbitmq:
     queue: ttLogHost-queue
