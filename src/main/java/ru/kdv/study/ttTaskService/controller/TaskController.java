@@ -51,4 +51,10 @@ public class TaskController {
     public Task updateTask(@RequestBody final TaskUpdate taskUpdate) {
         return taskService.update(taskUpdate);
     }
+
+    @GetMapping("/checkActualTaskByUser/{id}")
+    @Operation(summary = "Поиск актуальных задач по ID пользователя")
+    public boolean checkActualTask(@PathVariable Long id) {
+        return taskService.checkActualTaskByUser(id);
+    }
 }

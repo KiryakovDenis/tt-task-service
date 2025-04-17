@@ -49,6 +49,13 @@ public class TaskRepository {
             RETURNING *
             """;
 
+    private static final String IS_EXIST_ACTUAL_TASKS = """
+            SELECT exists(SELECT *
+                            FROM tt_tasks.task a
+                           WHERE a.status NOT IN ('DONE', 'DELETE')
+                             AND a.assignee = :id)
+            """;
+
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final TaskMapper taskMapper;
 
@@ -81,6 +88,14 @@ public class TaskRepository {
     public Task updateTask(Task task) {
         try {
             return jdbcTemplate.queryForObject(UPDATE, taskToSql(task), taskMapper);
+        } catch (Exception e) {
+            throw DataBaseException.create(e.getMessage());
+        }
+    }
+
+    public boolean checkActualTaskByUser(Long id) {
+        try {
+            return Boolean.TRUE.equals(jdbcTemplate.queryForObject(IS_EXIST_ACTUAL_TASKS, new MapSqlParameterSource("id", id), Boolean.class));
         } catch (Exception e) {
             throw DataBaseException.create(e.getMessage());
         }
