@@ -77,6 +77,11 @@ public class TaskService {
         return result;
     }
 
+    @Transactional(readOnly = true)
+    public boolean checkActualTaskByUser(Long id) {
+        return taskRepository.checkActualTaskByUser(id);
+    }
+
     private Task taskInsertToTask(final TaskInsert taskInsert) {
         return Task.builder()
                 .title(taskInsert.getTitle())
