@@ -31,7 +31,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserService userService;
     private final LogTaskService logTaskService;
-    private final StateMachineService stateMachineService;
+    private final TransitionService transitionService;
 
     @Transactional(rollbackFor = Exception.class)
     public Task create(final TaskInsert taskInsert) {
@@ -40,7 +40,7 @@ public class TaskService {
 
         Task result = taskRepository.insert(tempTask);
 
-        logTaskService.log(LogOperation.I, result);
+        logTaskService.log(LogOperation.INSERT, result);
 
         return result;
     }
@@ -72,7 +72,7 @@ public class TaskService {
 
         Task result = taskRepository.updateTask(tempTask);
 
-        logTaskService.log(LogOperation.U, result);
+        logTaskService.log(LogOperation.UPDATE, result);
 
         return result;
     }
@@ -144,7 +144,7 @@ public class TaskService {
     }
 
     private void validateStatusTransition(Status from, Status to) {
-        if ((!from.equals(to)) && (stateMachineService.checkTransition(from, to))) {
+        if ((!from.equals(to)) && (!transitionService.checkTransition(from, to))) {
             throw BadRequestException.create(String.format("Недопустимый переход состояний %s -> %s", from.name(), to.name()));
         }
     }
