@@ -31,7 +31,7 @@ public class RabbitConfiguration {
     }
 
     @Bean
-    public Queue ttLogtQueue() {
+    public Queue ttLogQueue() {
         return new Queue(rabbitConfigurationProperties.getQueue());
     }
 

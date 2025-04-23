@@ -9,6 +9,8 @@ import ru.kdv.study.ttTaskService.model.LogOperation;
 import ru.kdv.study.ttTaskService.model.Task;
 import ru.kdv.study.ttTaskService.model.dto.LogLine;
 
+import java.util.StringJoiner;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -25,9 +27,11 @@ public class LogTaskService {
                     new LogLine(logOperation, task)
             );
         } catch (Exception e) {
-            log.error("Ошибка при попытке логирования изменений данных о задаче");
-            log.error(task.toString());
-            log.error(e.getMessage());
+            log.error(new StringJoiner("/n")
+                    .add("Ошибка при попытке логирования изменений данных о задаче")
+                    .add(task.toString())
+                    .add(e.getMessage())
+                    .toString());
         }
     }
 }
