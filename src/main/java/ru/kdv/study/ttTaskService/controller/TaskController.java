@@ -1,6 +1,7 @@
 package ru.kdv.study.ttTaskService.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,5 +51,11 @@ public class TaskController {
     @Operation(summary = "Обновление задачи")
     public Task updateTask(@RequestBody final TaskUpdate taskUpdate) {
         return taskService.update(taskUpdate);
+    }
+
+    @GetMapping("/Actual")
+    @Operation(summary = "Поиск актуальных задач по ID пользователя")
+    public boolean checkActualTask(@Parameter(description = "ID пользователя", required = true) @RequestParam Long userId) {
+        return taskService.checkActualTaskByUser(userId);
     }
 }

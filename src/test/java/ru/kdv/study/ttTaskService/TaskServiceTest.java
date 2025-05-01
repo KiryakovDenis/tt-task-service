@@ -9,18 +9,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.kdv.study.ttTaskService.exception.BadRequestException;
+import ru.kdv.study.ttTaskService.model.Role;
 import ru.kdv.study.ttTaskService.model.Status;
 import ru.kdv.study.ttTaskService.model.Task;
+import ru.kdv.study.ttTaskService.model.User;
 import ru.kdv.study.ttTaskService.model.dto.TaskInsert;
 import ru.kdv.study.ttTaskService.model.dto.TaskUpdate;
 import ru.kdv.study.ttTaskService.repository.TaskRepository;
 import ru.kdv.study.ttTaskService.service.TaskService;
+import ru.kdv.study.ttTaskService.service.TransitionService;
 import ru.kdv.study.ttTaskService.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
@@ -34,6 +38,8 @@ public class TaskServiceTest {
     private TaskRepository taskRepository;
     @Mock
     private UserService userService;
+    @Mock
+    TransitionService transitionService;
 
     @InjectMocks
     private TaskService taskService;
@@ -187,5 +193,97 @@ public class TaskServiceTest {
         BadRequestException bre = assertThrows(BadRequestException.class, () -> taskService.create(ExpiredDeadLineInsertTask));
 
         assertThat(bre.getMessage()).isEqualTo(errorMessage);
+    }
+
+    @Test
+    public void testUpdate_withInvalidStatusTransition() {
+
+        TaskUpdate taskUpdate = new TaskUpdate(
+                1L,
+                "Updated Task",
+                "Updated Description",
+                Status.TO_DO,
+                2L,
+                2L,
+                LocalDateTime.now().plusDays(1)
+                );
+
+        Task findTask = Task.builder()
+                .id(taskUpdate.getId())
+                .title(taskUpdate.getTitle())
+                .description(taskUpdate.getDescription())
+                .status(Status.DONE)
+                .author(1L)
+                .assignee(taskUpdate.getAssignee())
+                .deadLine(taskUpdate.getDeadLine())
+                .build();
+
+        Task newUpdateTask = Task.builder()
+                .id(taskUpdate.getId())
+                .title(taskUpdate.getTitle())
+                .description(taskUpdate.getDescription())
+                .status(taskUpdate.getStatus())
+                .author(findTask.getAuthor())
+                .assignee(taskUpdate.getAssignee())
+                .deadLine(taskUpdate.getDeadLine())
+                .build();
+
+        Mockito.when(taskRepository.getById(taskUpdate.getId())).thenReturn(findTask);
+        Mockito.when(transitionService.checkTransition(findTask.getStatus(), taskUpdate.getStatus())).thenReturn(false);
+        Set<Long> setOfUsers =new HashSet<>(Arrays.asList(newUpdateTask.getAssignee(),
+                newUpdateTask.getAuthor()));
+        Mockito.when(userService.getUsersByIds(setOfUsers)).thenReturn(setOfUsers);
+
+        assertThrows(BadRequestException.class, () -> taskService.update(taskUpdate));
+    }
+
+    @Test
+    public void testUpdate_withInvalidEditorRole() {
+
+        TaskUpdate taskUpdate = new TaskUpdate(
+                1L,
+                "Updated Task",
+                "Updated Description",
+                Status.DONE,
+                2L,
+                2L,
+                LocalDateTime.now().plusDays(1)
+        );
+
+        Task findTask = Task.builder()
+                .id(taskUpdate.getId())
+                .title(taskUpdate.getTitle())
+                .description(taskUpdate.getDescription())
+                .status(taskUpdate.getStatus())
+                .author(1L)
+                .assignee(1L)
+                .deadLine(taskUpdate.getDeadLine())
+                .build();
+
+        Task newUpdateTask = Task.builder()
+                .id(taskUpdate.getId())
+                .title(taskUpdate.getTitle())
+                .description(taskUpdate.getDescription())
+                .status(taskUpdate.getStatus())
+                .author(findTask.getAuthor())
+                .assignee(taskUpdate.getAssignee())
+                .deadLine(taskUpdate.getDeadLine())
+                .build();
+
+        User editor = User.builder()
+                .id(taskUpdate.getEditor())
+                .username("editor")
+                .role(Role.USER)
+                .build();
+
+        Mockito.when(taskRepository.getById(taskUpdate.getId())).thenReturn(findTask);
+
+        Set<Long> setOfUsers =new HashSet<>(Arrays.asList(newUpdateTask.getAssignee(),
+                newUpdateTask.getAuthor()));
+        Mockito.when(userService.getUsersByIds(setOfUsers)).thenReturn(setOfUsers);
+        Mockito.when(userService.getUserById(editor.getId())).thenReturn(editor);
+
+        assertThrows(BadRequestException.class, () -> taskService.update(taskUpdate));
+        verify(taskRepository).getById(taskUpdate.getId());
     }
 }

@@ -18,18 +18,17 @@ public class UserService {
     private final RestTemplate restTemplate;
     private final UserServiceProperties userServiceProperties;
 
-    private static final String FIND_USER_URL = "/user";
+    private static final String FIND_USER_URL = "/user?ids={ids}";
+    private static final String GET_USER_BY_ID = "/user/{id}";
 
     public Set<Long> getUsersByIds(final Set<Long> ids) {
         try {
             String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
 
-
-            String fullUrl = buildUserUrl();
             return Arrays.stream(
                         Objects.requireNonNull(
                                 restTemplate.getForObject(
-                                        fullUrl,
+                                        userServiceProperties.getBaseUrl() + FIND_USER_URL,
                                         User[].class,
                                         idsString
                                 )
@@ -42,9 +41,11 @@ public class UserService {
         }
     }
 
-    private String buildUserUrl() {
-        return userServiceProperties.getBaseUrl() +
-                FIND_USER_URL +
-                "?ids={ids}";
+    public User getUserById(Long id) {
+        try {
+            return restTemplate.getForObject(userServiceProperties.getBaseUrl() + GET_USER_BY_ID, User.class, id);
+        } catch (Exception e) {
+            throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));
+        }
     }
 }

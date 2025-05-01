@@ -5,3 +5,7 @@ databaseChangeLog:
       file: db/changelog/202504011811__create_table.sql
   - include:
       file: db/changelog/202504011909__create_trigger_on_task.sql
+  - include:
+      file: db/changelog/202504221300__create_transit_table.sql
+  - include:
+      file: db/changelog/202504221302__insert_transition.sql
