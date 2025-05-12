@@ -20,6 +20,7 @@ public class UserService {
 
     private static final String FIND_USER_URL = "/user?ids={ids}";
     private static final String GET_USER_BY_ID = "/user/{id}";
+    private static final String FIND_USERS_BY_TEAM = "/member?teamId={teamId}";
 
     public Set<Long> getUsersByIds(final Set<Long> ids) {
         try {
@@ -39,6 +40,19 @@ public class UserService {
         } catch (Exception e) {
             throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));
         }
+    }
+
+    public Set<User> findUsersByTeam(Long teamId) {
+        try {
+            return Arrays.stream(
+                    Objects.requireNonNull(
+                            restTemplate.getForObject(
+                                    userServiceProperties.getBaseUrl() + FIND_USERS_BY_TEAM,
+                                    User[].class,
+                                    teamId)))
+                    .collect(Collectors.toSet());
+        } catch (Exception e) {
+        throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));}
     }
 
     public User getUserById(Long id) {
