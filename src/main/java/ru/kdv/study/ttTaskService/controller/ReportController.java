@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.kdv.study.ttTaskService.model.Report;
+import ru.kdv.study.ttTaskService.model.dto.ReportRequest;
 import ru.kdv.study.ttTaskService.service.ReportService;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/v1/report")
@@ -21,7 +24,9 @@ public class ReportController {
 
     @GetMapping
     @Operation(summary = "Получение статистической информации по команде")
-    public Report getReport(@Parameter(description = "ID команды", required = true) @RequestParam Long teamId ) {
-        return reportService.getStatisticsReport(teamId);
+    public Report getReport(@Parameter(description = "ID команды", required = true) @RequestParam Long teamId,
+                            @Parameter(description = "Дата начала периода", required = true) @RequestParam LocalDateTime beginDate,
+                            @Parameter(description = "Дата окончания периода", required = true) @RequestParam LocalDateTime endDate) {
+        return reportService.getStatisticsReport(new ReportRequest(teamId, beginDate, endDate));
     }
 }

@@ -8,6 +8,7 @@ import ru.kdv.study.ttTaskService.exception.DataBaseException;
 import ru.kdv.study.ttTaskService.model.Report;
 import ru.kdv.study.ttTaskService.repository.mapper.ReportMapper;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,7 +30,8 @@ public class ReportRepository {
                        AND a.assignee IN (:ids)
                        AND a.status = 'DONE') AS avg_time_execute_task
               FROM tt_tasks.task a
-             WHERE a.assignee IN (:ids)""";
+             WHERE a.assignee IN (:ids)
+               AND coalesce(created_at, updated_at) between :begin_date AND :end_date""";
 
     private static final String GET_TOP_WORKERS = """
             WITH t as(
@@ -37,6 +39,7 @@ public class ReportRepository {
                     ,count(1) cnt
                 FROM tt_tasks.task a
                WHERE a.assignee IN (:ids)
+                 AND coalesce(created_at, updated_at) between :begin_date AND :end_date
                GROUP BY a.assignee
             )
             SELECT user_id
@@ -59,19 +62,28 @@ public class ReportRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
     private final ReportMapper reportMapper;
 
-    public Report getStatisticsReport(Set<Long> userIds) {
+    public Report getStatisticsReport(Set<Long> ids, LocalDateTime beginDate, LocalDateTime endDate) {
         try {
-            return jdbcTemplate.queryForObject(GET_STATISTICS, new MapSqlParameterSource("ids", userIds), reportMapper);
+            return jdbcTemplate.queryForObject(GET_STATISTICS, createReportParams(ids, beginDate, endDate), reportMapper);
         } catch (Exception e) {
             throw DataBaseException.create(e.getMessage());
         }
     }
 
-    public Set<Long> getTopWorkers(Set<Long> userId) {
+    public Set<Long> getTopWorkers(Set<Long> ids, LocalDateTime beginDate, LocalDateTime endDate) {
         try {
-            return new HashSet<>(jdbcTemplate.queryForList(GET_TOP_WORKERS, new MapSqlParameterSource("ids", userId), Long.class));
+            return new HashSet<>(jdbcTemplate.queryForList(GET_TOP_WORKERS, createReportParams(ids, beginDate, endDate), Long.class));
         } catch (Exception e) {
             throw DataBaseException.create(e.getMessage());
         }
     }
+
+    private MapSqlParameterSource createReportParams(Set<Long> ids, LocalDateTime beginDate, LocalDateTime endDate) {
+        MapSqlParameterSource params = new MapSqlParameterSource();
+        params.addValue("ids", ids);
+        params.addValue("begin_date", beginDate);
+        params.addValue("end_date", endDate);
+        return params;
+    }
+
 }

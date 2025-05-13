@@ -7,10 +7,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.kdv.study.ttTaskService.model.Report;
 import ru.kdv.study.ttTaskService.model.User;
+import ru.kdv.study.ttTaskService.model.dto.ReportRequest;
 import ru.kdv.study.ttTaskService.repository.ReportRepository;
 import ru.kdv.study.ttTaskService.service.ReportService;
 import ru.kdv.study.ttTaskService.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +36,9 @@ public class ReportServiceTest {
     @Test
     public void testGetStatisticsReport() {
         Long teamId = 1L;
+        LocalDateTime startDate = LocalDateTime.now();
+        LocalDateTime endDate = LocalDateTime.now().plusDays(1);
+
         Set<User> users = new HashSet<>(Arrays.asList(
                 User.builder().id(1L).username("User1").build(),
                 User.builder().id(2L).username("User2").build(),
@@ -43,13 +48,24 @@ public class ReportServiceTest {
         Report report = Report.builder().build();
 
         when(userService.findUsersByTeam(teamId)).thenReturn(users);
-        when(reportRepository.getStatisticsReport(users.stream().map(User::getId).collect(Collectors.toSet()))).thenReturn(report);
-        when(reportRepository.getTopWorkers(users.stream().map(User::getId).collect(Collectors.toSet()))).thenReturn(top3Ids);
+        when(reportRepository.getStatisticsReport(
+                users.stream()
+                        .map(User::getId)
+                        .collect(Collectors.toSet()),
+                startDate,
+                endDate)
+        ).thenReturn(report);
+        when(reportRepository.getTopWorkers(
+                users.stream()
+                        .map(User::getId)
+                        .collect(Collectors.toSet()),
+                startDate,
+                endDate)
+        ).thenReturn(top3Ids);
 
-        Report result = reportService.getStatisticsReport(teamId);
+        Report result = reportService.getStatisticsReport(new ReportRequest(teamId, startDate, endDate));
 
         assertEquals(report, result);
         assertEquals(Arrays.asList("User1", "User2", "User3"), result.getTopUser());
     }
 }
-

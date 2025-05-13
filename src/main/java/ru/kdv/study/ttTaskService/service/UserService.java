@@ -52,7 +52,8 @@ public class UserService {
                                     teamId)))
                     .collect(Collectors.toSet());
         } catch (Exception e) {
-        throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));}
+            throw ExternalServiceException.create(String.format("Ошибка внешнего сервиса users: \n %s", e.getMessage()));
+        }
     }
 
     public User getUserById(Long id) {
